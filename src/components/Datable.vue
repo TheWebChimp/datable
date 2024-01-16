@@ -2,27 +2,7 @@
 	<div class="data-table d-flex flex-column flex-grow-1">
 		<div class="data-table-actions mb-3">
 			<div class="col-search">
-				<form @submit.prevent="search">
-					<div class="input-group">
-						<input
-							type="text"
-							class="form-control"
-							:placeholder="getDictionary('search')"
-							v-model="searchQuery"
-						>
-						<button
-							type="reset"
-							class="btn btn-clear"
-							v-if="searchQuery"
-							@click="clearSearch"
-						>
-							<i class="far fa-fw fa-times" />
-						</button>
-						<button class="btn btn-primary" type="submit">
-							<i class="far fa-fw fa-search" /> {{ getDictionary('searchButton') }}
-						</button>
-					</div>
-				</form>
+				<datable-search v-model="searchQuery" @search="search" />
 			</div>
 			<div class="col-other-actions">
 				<slot name="meta-actions" />
@@ -73,14 +53,35 @@
 										class="sort-icon"
 										v-if="!!field.sort"
 									>
-										<i
-											class="sort-icon-fa"
-											:class="{
-												'fa-sort': !props.sort.field || props.sort.field !== field.value,
-												'fa-sort-up': (props.sort.field === field.value || props.sort.field === field.sortValue) && props.sort.order === 'asc',
-												'fa-sort-down': (props.sort.field === field.value || props.sort.field === field.sortValue) && props.sort.order === 'desc',
-											}"
-										/>
+										<svg
+											v-if="!props.sort.field || props.sort.field !== field.value"
+											xmlns="http://www.w3.org/2000/svg"
+											height="10"
+											width="10"
+											viewBox="0 0 320 512"
+										>
+											<path d="M137.4 41.4c12.5-12.5 32.8-12.5 45.3 0l128 128c9.2 9.2 11.9 22.9 6.9 34.9s-16.6 19.8-29.6 19.8H32c-12.9 0-24.6-7.8-29.6-19.8s-2.2-25.7 6.9-34.9l128-128zm0 429.3l-128-128c-9.2-9.2-11.9-22.9-6.9-34.9s16.6-19.8 29.6-19.8H288c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-128 128c-12.5 12.5-32.8 12.5-45.3 0z" />
+										</svg>
+
+										<svg
+											v-if="(props.sort.field === field.value || props.sort.field === field.sortValue) && props.sort.order === 'asc'"
+											xmlns="http://www.w3.org/2000/svg"
+											height="10"
+											width="10"
+											viewBox="0 0 320 512"
+										>
+											<path d="M182.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z" />
+										</svg>
+
+										<svg
+											v-if="(props.sort.field === field.value || props.sort.field === field.sortValue) && props.sort.order === 'desc'"
+											xmlns="http://www.w3.org/2000/svg"
+											height="10"
+											width="10"
+											viewBox="0 0 320 512"
+										>
+											<path d="M182.6 470.6c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-9.2-9.2-11.9-22.9-6.9-34.9s16.6-19.8 29.6-19.8H288c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-128 128z" />
+										</svg>
 									</a>
 								</div>
 							</th>
@@ -181,6 +182,7 @@
 </template>
 
 <script setup>
+	import DatableSearch from './Search.vue';
 	import { VueAwesomePaginate } from 'vue-awesome-paginate';
 	import Loading from 'vue3-loading-overlay';
 	import 'vue3-loading-overlay/dist/vue3-loading-overlay.css';
@@ -201,7 +203,7 @@
 		},
 		checkboxes: {
 			type: Boolean,
-			default: false,
+			default: true,
 		},
 		sort: {
 			type: Object,
@@ -364,32 +366,20 @@
 		isLoading.value = true;
 
 		try {
-
 			const params = {
-					page: currentPage.value,
-					limit: perPage.value,
-					by: props.sort.field,
-					order: props.sort.order,
-					q: searchQuery.value,
-					refresh: new Date().getTime(),
-				};
+				page: currentPage.value,
+				limit: perPage.value,
+				by: props.sort.field,
+				order: props.sort.order,
+				q: searchQuery.value,
+				refresh: new Date().getTime(),
+			};
 
 			// prepare the params
 			const paramsString = Object.keys(params).map((key) => `${ key }=${ params[key] }`).join('&');
 
-
-
-
 			const res = await fetch(`${ props.endpoint }?${ paramsString }`, {
 				method: 'GET',
-				params: {
-					page: currentPage.value,
-					limit: perPage.value,
-					by: props.sort.field,
-					order: props.sort.order,
-					q: searchQuery.value,
-					refresh: new Date().getTime(),
-				},
 				...props.fetchOptions,
 			});
 
@@ -646,56 +636,12 @@
 
 	$md: 576px
 
-	.pretty-scrolls
-
-		// pretty scrolls
-		&::-webkit-scrollbar
-
-			width: 0.5rem
-			height: 0.5rem
-
-		&::-webkit-scrollbar-track
-
-			background: var(--bs-gray-100)
-
-		&::-webkit-scrollbar-thumb
-
-			background: var(--bs-gray-300)
-
-		&::-webkit-scrollbar-thumb:hover
-
-			background: var(--bs-gray-400)
-
-		&::-webkit-scrollbar-thumb:active
-
-			background: var(--bs-gray-500)
-
-		&::-webkit-scrollbar-corner
-
-			background: var(--bs-gray-100)
-
-		&::-webkit-scrollbar-button
-
-			background: var(--bs-gray-100)
-
-		&::-webkit-scrollbar-button:start:decrement
-
-			height: 0
-
-		&::-webkit-scrollbar-button:end:increment
-
-			height: 0
-
-		&::-webkit-scrollbar-button:horizontal:start:decrement
-
-			width: 0
-
-		&::-webkit-scrollbar-button:horizontal:end:increment
-
-			width: 0
 
 	.data-table
 		container-type: inline-size
+
+		input[type="checkbox"]
+			accent-color: var(--bs-primary)
 
 	.data-table-actions
 		display: flex
@@ -724,19 +670,19 @@
 		width: 50px
 
 	:deep(.resizing)
-		background: var(--bs-gray-300)
+		background: var(--bs-border-color)
 
 	.data-table-wrapper
 		position: absolute
 		height: 100%
 		width: 100%
-		overflow: hidden
+		overflow: auto
 
 	.table
 		width: 100%
 		position: relative
 		border-collapse: collapse
-		background: var(--bs-white)
+		background: var(--bs-body-bg)
 		table-layout: fixed
 
 		&.no-data
@@ -745,7 +691,7 @@
 
 		:deep(td)
 			padding: 0.5rem
-			border-bottom: 1px solid var(--bs-gray-300)
+			border-bottom: 1px solid var(--bs-border-color)
 			white-space: nowrap
 			text-overflow: ellipsis
 			overflow: hidden
@@ -754,8 +700,8 @@
 		:deep(th)
 			position: sticky
 			top: 0
-			z-index: 100
-			background: var(--bs-white)
+			z-index: 1000
+			background: var(--bs-table-bg)
 			font-size: 0.65rem
 			white-space: nowrap
 			text-overflow: ellipsis
@@ -785,7 +731,7 @@
 				left: 0
 				width: 100%
 				height: 1px
-				background: var(--bs-gray-300)
+				background: var(--bs-border-color)
 
 			span
 				text-overflow: ellipsis
@@ -804,7 +750,7 @@
 				pointer-events: none
 
 			&:hover
-				background: var(--bs-gray-300)
+				background: var(--bs-border-color)
 
 		// Last column resizer cannot be dragged
 		:deep(th:last-child .resizer)
@@ -872,4 +818,17 @@
 
 		img
 			width: 50%
+
+	.sort-icon
+		svg
+			path
+				fill: var(--bs-primary)
+
+	:deep(.vld-overlay)
+		svg
+			stroke: var(--bs-primary)
+
+		.vld-background
+			opacity: 0.75
+			background: var(--bs-body-bg)
 </style>

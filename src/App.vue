@@ -1,10 +1,16 @@
 <template>
-	<div class="d-flex flex-column" style="width: 1000px; height: 500px;">
-		<datable
-			:endpoint="'http://localhost:1337/users'"
-			:fields="fields"
-			:fetch-options="{ headers: headers }"
-		/>
+	<div class="container">
+		<div class="d-flex flex-column datable-wrapper">
+			<datable
+				:endpoint="'http://localhost:1337/users'"
+				:fields="fields"
+				:fetch-options="{ headers: headers }"
+			>
+				<template #object="{ item }">
+					<pre>{{ item }}</pre>
+				</template>
+			</datable>
+		</div>
 	</div>
 </template>
 
@@ -21,7 +27,7 @@
 		{
 			text: 'Id',
 			value: 'id',
-			width: '100px',
+			width: 100,
 			minWidth: 50,
 			class: 'text-center',
 			sort: true,
@@ -31,10 +37,20 @@
 			value: 'type',
 			sort: true,
 			sortValue: 'type',
+			width: 50,
+			minWidth: 100,
+		},
+		{
+			text: 'Object',
+			value: 'object',
 			minWidth: '100px',
 		},
 	];
 </script>
 
 <style scoped>
+
+	.datable-wrapper {
+		height: 500px;
+	}
 </style>
