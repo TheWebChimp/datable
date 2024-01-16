@@ -7,9 +7,9 @@ export default defineConfig({
 	plugins: [ vue() ],
 	build: {
 		lib: {
-			// src/indext.js is where we have exported the component(s)
+			// src/index.js is where we have exported the component(s)
 			entry: resolve(__dirname, 'src/index.js'),
-			name: 'BrianComponentLibrary',
+			name: 'Datable',
 			// the name of the output files when the build is run
 			fileName: 'datable',
 		},
