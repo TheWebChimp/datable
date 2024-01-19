@@ -378,7 +378,11 @@
 			// prepare the params
 			const paramsString = Object.keys(params).map((key) => `${ key }=${ params[key] }`).join('&');
 
-			const res = await fetch(`${ props.endpoint }?${ paramsString }`, {
+			// check if the endpoint already has a query string, if yes, add the params with &
+			// if not, add the params with ?
+			const url = props.endpoint.includes('?') ? `${ props.endpoint }&${ paramsString }` : `${ props.endpoint }?${ paramsString }`;
+
+			const res = await fetch(url, {
 				method: 'GET',
 				...props.fetchOptions,
 			});
