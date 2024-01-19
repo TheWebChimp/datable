@@ -209,7 +209,7 @@
 			type: Object,
 			default: () => ({
 				field: 'id',
-				order: 'asc',
+				order: 'desc',
 			}),
 		},
 		dictionary: {
