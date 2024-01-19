@@ -2,7 +2,7 @@
 	<div class="data-table d-flex flex-column flex-grow-1">
 		<div class="data-table-actions mb-3">
 			<div class="col-search">
-				<datable-search v-model="searchQuery" @search="search" />
+				<datable-search v-model="searchQuery" @search="search" @clear="clearSearch" />
 			</div>
 			<div class="col-other-actions">
 				<slot name="meta-actions" />

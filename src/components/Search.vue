@@ -60,7 +60,7 @@
 		},
 	});
 
-	const emit = defineEmits([ 'update:modelValue', 'search' ]);
+	const emit = defineEmits([ 'update:modelValue', 'search', 'clear' ]);
 
 	const baseDictionary = {
 		search: 'Search...',
@@ -77,6 +77,7 @@
 	const clear = () => {
 		searchQuery.value = '';
 		emit('update:modelValue', '');
+		emit('clear');
 	};
 </script>
 
